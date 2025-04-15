@@ -177,10 +177,6 @@ class UserSideController extends Controller
 
     public function filterProperties(Request $request)
     {
-        return response()->json([
-            'message' => "Testing if updating",
-        ], 200);
-
         $user_id = $request->header('user-id');
 
         $where = [['user_id', $user_id]];
