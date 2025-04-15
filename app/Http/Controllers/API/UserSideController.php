@@ -180,49 +180,31 @@ class UserSideController extends Controller
         $user_id = $request->header('user-id');
 
         $where = [['user_id', $user_id]];
-        $whereIn = [];
 
         $location = $request->query('location');
         if ($location) {
-            array_push($where, ['property_location', 'LIKE', "%$location%"]);
+            $where[] = ['property_location', 'LIKE', "%$location%"];
         }
 
-        $unit_type = $request->query('unit_type');
-        if ($unit_type != "") {
-            $unitOptions = [
-                "Studio",
-                "1BR",
-                "2BR",
-                "3BR",
-                "Tandem",
-            ];
-
-            $type = $unitOptions[$unit_type >= 5 ? $unit_type - 5 : $unit_type];
-            array_push($where, ['property_type', $type]);
+        $type = $request->query('types'); // now this is the full string like "Studio w/ Parking"
+        if ($type) {
+            $where[] = ['property_type', $type];
         }
 
         $min_price = $request->query('min_price');
-        if ($min_price) {
-            array_push($where, ['property_price', '>=', $min_price]);
-        }
-
         $max_price = $request->query('max_price');
-        if ($max_price) {
-            array_push($where, ['property_price', '<=', $max_price]);
+        if ($min_price && $max_price) {
+            $where[] = ['property_price', '>=', $min_price];
+            $where[] = ['property_price', '<=', $max_price];
         }
 
         $relations = ['user', 'property.buildings', 'property.features'];
-        $records = PropertyListings::with($relations)->where($where);
+        $records = PropertyListings::with($relations)->where($where)->get();
 
-        if ($unit_type != "") {
-            $parking = $unit_type >= 5 ? ["With Parking", "With Tandem Parking"] : ["N/A"];
-            $records->whereIn('property_parking', $parking);
-        }
-
-        $records = $records->get();
-        $code = 200;
-        $response = ['message' => "Filtered Properties", 'records' => $records];
-        return response()->json($response, $code);
+        return response()->json([
+            'message' => "Filtered Properties",
+            'records' => $records,
+        ], 200);
     }
 
     public function submitProperty(Request $request)
