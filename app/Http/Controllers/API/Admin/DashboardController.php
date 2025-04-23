@@ -10,7 +10,7 @@ use App\Models\Property;
 use App\Models\Appointment;
 use App\Models\Inquiry;
 use App\Models\Application;
-
+use App\Models\PropertyListings;
 
 class DashboardController extends Controller
 {
@@ -24,7 +24,7 @@ class DashboardController extends Controller
             $where = [];
         }
 
-        $properties = Property::where($where)->get()->count();
+        $properties = PropertyListings::where($where)->get()->count();
         $inquiries = Inquiry::where($where)->get()->count();
         $viewings = Appointment::where($where)->get()->count();
         $applications = Application::get()->count();
