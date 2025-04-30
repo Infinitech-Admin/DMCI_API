@@ -32,6 +32,8 @@ class PropertyListings extends Model
         'property_plan_cut',
         'property_plan_status',
         'property_plan_image',
+        'property_furnishing_status',
+        'property_furnishing_items',
     ];
 
     public static function booted()
@@ -40,16 +42,17 @@ class PropertyListings extends Model
             $record->id = Str::ulid();
         });
     }
+    protected $casts = [
+        'property_furnishing_items' => 'array', // ✅ important
+    ];
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class); 
+        return $this->belongsTo(User::class);
     }
 
     public function property(): BelongsTo
     {
-        return $this->belongsTo(Property::class); 
+        return $this->belongsTo(Property::class);
     }
 }
-
-

@@ -64,8 +64,14 @@ class PropertyListingsController extends Controller
             'property_plan_cut' => 'required|max:255',
             'property_plan_status' => 'required|max:255',
             'property_plan_image' => 'required',
+            // ✅ ADD THESE NEW VALIDATIONS:
+            'property_furnishing_status' => 'nullable|string|max:255',
+            'property_furnishing_items' => 'nullable',
         ]);
-
+        // After validation
+        if (is_string($validated['property_furnishing_items'])) {
+            $validated['property_furnishing_items'] = json_decode($validated['property_furnishing_items'], true);
+        }
         $validated['property_featured'] = false;
 
         $key = 'images';
@@ -81,7 +87,6 @@ class PropertyListingsController extends Controller
         if ($request->hasFile($key)) {
             $validated[$key] = $this->upload($request->file($key), "properties/images");
         }
-        
 
         $record = Model::create($validated);
 
@@ -95,6 +100,7 @@ class PropertyListingsController extends Controller
         ];
         return response()->json($response, $code);
     }
+
 
     // Update
 
@@ -118,7 +124,15 @@ class PropertyListingsController extends Controller
             'property_plan_cut' => 'required|max:255',
             'property_plan_status' => 'required|max:255',
             'property_plan_image' => 'required',
+            'property_furnishing_status' => 'nullable|string|max:255',
+            'property_furnishing_items' => 'nullable',
+
         ]);
+
+
+        if (is_string($validated['property_furnishing_items'] ?? null)) {
+            $validated['property_furnishing_items'] = json_decode($validated['property_furnishing_items'], true);
+        }
 
         $key = 'images';
         if ($request[$key]) {
@@ -130,7 +144,7 @@ class PropertyListingsController extends Controller
         }
 
         $record = Model::find($validated['id']);
-    
+
         $key = 'property_plan_image';
         if ($request->hasFile($key)) {
             Storage::disk('s3')->delete("properties/images/$record[$key]");
