@@ -73,7 +73,7 @@ class ArticleController extends Controller
 
         $key = 'image';
         if ($request->hasFile($key)) {
-            Storage::disk('s3')->delete("articles/$record[$key]");
+            Storage::disk('public')->delete("articles/$record[$key]");
             $validated[$key] = $this->upload($request->file($key), "articles");
         }
 
@@ -87,7 +87,7 @@ class ArticleController extends Controller
     {
         $record = Model::find($id);
         if ($record) {
-            Storage::disk('s3')->delete("articles/$record->image");
+            Storage::disk('public')->delete("articles/$record->image");
             $record->delete();
             $code = 200;
             $response = ['message' => "Deleted $this->model"];
